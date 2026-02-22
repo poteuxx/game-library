@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GameLibrary</title>
+<title>Community Game Hub</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
 <style>
 
 *{
@@ -12,368 +16,300 @@ box-sizing:border-box;
 
 body{
 margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:#0f172a;
+font-family:Inter, sans-serif;
+background:#0b0f17;
 color:white;
+overflow-x:hidden;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
 }
 
 header{
+padding:30px;
+text-align:center;
+font-size:32px;
+font-weight:600;
+letter-spacing:1px;
+background:rgba(15,18,27,.8);
+backdrop-filter:blur(10px);
+}
+
+.controls{
 display:flex;
-justify-content:space-between;
-align-items:center;
-padding:18px 25px;
-background:#020617;
-border-bottom:1px solid #1e293b;
-position:sticky;
-top:0;
-z-index:10;
+justify-content:center;
+flex-wrap:wrap;
+gap:10px;
+padding:20px;
 }
 
-.logo{
-font-size:20px;
-font-weight:bold;
-color:#38bdf8;
-}
-
-.search{
-padding:8px 12px;
-border-radius:6px;
+input{
+padding:10px 14px;
+border-radius:8px;
 border:none;
+outline:none;
 width:220px;
 }
 
-.container{
-padding:30px;
-max-width:1400px;
-margin:auto;
-}
-
-.categories{
-display:flex;
-gap:10px;
-margin-bottom:20px;
-flex-wrap:wrap;
-}
-
-.cat{
-padding:6px 14px;
-border-radius:20px;
-background:#1e293b;
-cursor:pointer;
-font-size:14px;
-}
-
-.cat.active{
-background:#38bdf8;
-color:black;
+select{
+padding:10px 14px;
+border-radius:8px;
+border:none;
 }
 
 .grid{
+padding:30px;
 display:grid;
-grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-gap:20px;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:24px;
 }
 
 .card{
-background:#020617;
-border:1px solid #1e293b;
-border-radius:10px;
+background:rgba(255,255,255,.04);
+border:1px solid rgba(255,255,255,.08);
+border-radius:14px;
 overflow:hidden;
 transition:.25s;
-cursor:pointer;
+backdrop-filter:blur(8px);
 }
 
 .card:hover{
-transform:translateY(-6px);
-border-color:#38bdf8;
+transform:translateY(-8px) scale(1.02);
+border-color:#5b7cff;
+box-shadow:0 10px 40px rgba(0,0,0,.5);
 }
 
-.cover{
-height:140px;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:45px;
-background:#111827;
+.card img{
+width:100%;
+height:160px;
+object-fit:cover;
 }
 
-.info{
-padding:15px;
+.content{
+padding:16px;
 }
 
 .title{
 font-size:18px;
-margin-bottom:6px;
+font-weight:600;
 }
 
-.genre{
-font-size:12px;
+.desc{
+font-size:13px;
 opacity:.7;
+margin-top:6px;
 }
 
-.buttons{
-margin-top:10px;
-display:flex;
-gap:8px;
+.players{
+margin-top:8px;
+font-size:13px;
+color:#7aa2ff;
 }
 
-button{
-flex:1;
-padding:7px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-background:#38bdf8;
-font-weight:bold;
+.tags{
+margin-top:8px;
+font-size:12px;
+opacity:.6;
 }
 
-button.secondary{
-background:#1e293b;
+.btn{
+margin-top:12px;
+display:inline-block;
+padding:8px 12px;
+border-radius:8px;
+background:#5865f2;
+font-size:13px;
+text-decoration:none;
 color:white;
 }
 
-.modal{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.7);
-display:none;
-align-items:center;
-justify-content:center;
-}
-
-.modalContent{
-background:#020617;
-border:1px solid #1e293b;
-padding:25px;
-border-radius:10px;
-width:400px;
-max-width:90%;
-}
-
-.close{
-float:right;
-cursor:pointer;
-font-size:18px;
-opacity:.7;
-}
-
-footer{
-text-align:center;
-padding:25px;
-opacity:.6;
+.btn:hover{
+background:#7380ff;
 }
 
 </style>
 </head>
+
 <body>
-<header>
-<div class="logo">GameVault</div>
-<input class="search" placeholder="Search game..." oninput="searchGames(this.value)">
-</header>
-<div class="container">
-<div class="categories" id="categories"></div>
-<div class="grid" id="library"></div>
+
+<canvas id="particles"></canvas>
+
+<header>Community Game Hub</header>
+
+<div class="controls">
+<input id="search" placeholder="Search games...">
+<select id="filter">
+<option value="all">All</option>
+<option value="cod">Call of Duty</option>
+<option value="battlefield">Battlefield</option>
+<option value="wow">World of Warcraft</option>
+</select>
 </div>
-<div class="modal" id="modal">
-<div class="modalContent">
-<h2 id="modalTitle"></h2>
-<p id="modalGenre"></p>
-<p id="modalDesc"></p>
-<div style="margin-top:15px;display:flex;gap:10px;">
-<button id="playBtn">Download</button>
-<button class="secondary" id="shareBtn">Share</button>
-</div>
-</div>
-</div>
-<footer>
-GameVault Library
-</footer>
+
+<div class="grid" id="games"></div>
+
 <script>
 
 const games = [
 
 {
-title:"Cyber Drift",
-genre:"Racing",
-category:"Racing",
-cover:"🏎️",
-file:"games/cyber_drift.zip",
-description:"High speed futuristic racing game."
+name:"IW4x",
+desc:"Modern Warfare 2 community multiplayer client",
+img:"https://images.launchbox-app.com/5c1d1c19-62a5-4a67-8c6f-0eacfc9c8a1f.jpg",
+tag:"cod"
 },
 
 {
-title:"Dungeon Quest",
-genre:"RPG",
-category:"RPG",
-cover:"🐉",
-file:"games/dungeon_quest.zip",
-description:"Explore dungeons and collect treasure."
+name:"Call of Duty T4",
+desc:"World at War multiplayer build",
+img:"https://cdn.cloudflare.steamstatic.com/steam/apps/10090/header.jpg",
+tag:"cod"
 },
 
 {
-title:"Pixel War",
-genre:"Shooter",
-category:"Action",
-cover:"🔫",
-file:"games/pixel_war.zip",
-description:"Fast paced pixel shooter."
+name:"Call of Duty T5",
+desc:"Black Ops multiplayer client",
+img:"https://cdn.cloudflare.steamstatic.com/steam/apps/42700/header.jpg",
+tag:"cod"
 },
 
 {
-title:"Sky Adventures",
-genre:"Platformer",
-category:"Adventure",
-cover:"🎮",
-file:"games/sky_adventure.zip",
-description:"Classic platformer challenge."
+name:"Call of Duty T6",
+desc:"Black Ops II community version",
+img:"https://cdn.cloudflare.steamstatic.com/steam/apps/202970/header.jpg",
+tag:"cod"
+},
+
+{
+name:"Call of Duty T7",
+desc:"Black Ops III client",
+img:"https://cdn.cloudflare.steamstatic.com/steam/apps/311210/header.jpg",
+tag:"cod"
+},
+
+{
+name:"Battlefield 2",
+desc:"Large scale battlefield combat",
+img:"https://cdn.cloudflare.steamstatic.com/steam/apps/24860/header.jpg",
+tag:"battlefield"
+},
+
+{
+name:"WoW Warmane",
+desc:"Wrath of the Lich King private server",
+img:"https://static.wikia.nocookie.net/wowpedia/images/5/53/Wrath_of_the_Lich_King_cover.jpg",
+tag:"wow"
+},
+
+{
+name:"WoW Turtle",
+desc:"Vanilla+ WoW server",
+img:"https://turtle-wow.org/img/logo.png",
+tag:"wow"
+},
+
+{
+name:"WoW ReShade HD",
+desc:"Enhanced graphics version",
+img:"https://reshade.me/img/social.png",
+tag:"wow"
 }
 
 ];
 
-let currentCategory="All";
+const grid = document.getElementById("games");
 
-const library=document.getElementById("library");
-const categories=document.getElementById("categories");
+function render(){
+grid.innerHTML="";
 
-function buildCategories(){
+const search = document.getElementById("search").value.toLowerCase();
+const filter = document.getElementById("filter").value;
 
-const list=["All",...new Set(games.map(g=>g.category))];
+games
+.filter(g=> (filter==="all" || g.tag===filter))
+.filter(g=> g.name.toLowerCase().includes(search))
+.forEach(g=>{
 
-list.forEach(cat=>{
+const players = Math.floor(Math.random()*5000)+200;
 
-const el=document.createElement("div");
-el.className="cat";
-el.innerText=cat;
+const card = document.createElement("div");
+card.className="card";
 
-if(cat==="All") el.classList.add("active");
+card.innerHTML=`
+<img src="${g.img}">
+<div class="content">
+<div class="title">${g.name}</div>
+<div class="desc">${g.desc}</div>
+<div class="players">Online Players: ${players}</div>
+<div class="tags">${g.tag.toUpperCase()}</div>
+<a class="btn" href="#">Open</a>
+</div>
+`;
 
-el.onclick=()=>{
-currentCategory=cat;
-
-document.querySelectorAll(".cat").forEach(c=>c.classList.remove("active"));
-el.classList.add("active");
-
-renderGames();
-};
-
-categories.appendChild(el);
+grid.appendChild(card);
 
 });
 
 }
 
-function renderGames(){
+document.getElementById("search").oninput=render;
+document.getElementById("filter").onchange=render;
 
-library.innerHTML="";
+render();
 
-let filtered=games;
+/* particles */
 
-if(currentCategory!=="All"){
-filtered=filtered.filter(g=>g.category===currentCategory);
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const particles = [];
+
+for(let i=0;i<80;i++){
+particles.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2+1,
+dx:(Math.random()-.5)*.5,
+dy:(Math.random()-.5)*.5
+});
 }
 
-filtered.forEach(game=>{
+function animate(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
 
-const card=document.createElement("div");
-card.className="card";
+particles.forEach(p=>{
 
-card.innerHTML=`
+p.x+=p.dx;
+p.y+=p.dy;
 
-<div class="cover">${game.cover}</div>
+if(p.x<0||p.x>canvas.width) p.dx*=-1;
+if(p.y<0||p.y>canvas.height) p.dy*=-1;
 
-<div class="info">
-<div class="title">${game.title}</div>
-<div class="genre">${game.genre}</div>
-
-<div class="buttons">
-<button onclick="downloadGame(event,'${game.file}')">Download</button>
-<button class="secondary" onclick="shareGame(event,'${game.title}')">Share</button>
-</div>
-
-</div>
-`;
-
-card.onclick=()=>openModal(game);
-
-library.appendChild(card);
+ctx.beginPath();
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+ctx.fillStyle="rgba(120,140,255,.7)";
+ctx.fill();
 
 });
 
+requestAnimationFrame(animate);
 }
 
-function searchGames(text){
+animate();
 
-text=text.toLowerCase();
-
-const filtered=games.filter(g =>
-g.title.toLowerCase().includes(text)
-);
-
-library.innerHTML="";
-
-filtered.forEach(game=>createCard(game));
-
+window.onresize=()=>{
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
 }
-
-function createCard(game){
-
-const card=document.createElement("div");
-card.className="card";
-
-card.innerHTML=`
-
-<div class="cover">${game.cover}</div>
-
-<div class="info">
-<div class="title">${game.title}</div>
-<div class="genre">${game.genre}</div>
-</div>
-`;
-
-card.onclick=()=>openModal(game);
-
-library.appendChild(card);
-
-}
-
-function openModal(game){
-
-document.getElementById("modal").style.display="flex";
-
-document.getElementById("modalTitle").innerText=game.title;
-document.getElementById("modalGenre").innerText=game.genre;
-document.getElementById("modalDesc").innerText=game.description;
-
-document.getElementById("playBtn").onclick=()=>{
-window.location=game.file;
-};
-
-document.getElementById("shareBtn").onclick=()=>{
-navigator.clipboard.writeText(game.title);
-alert("Game copied to clipboard");
-};
-
-}
-
-function closeModal(){
-document.getElementById("modal").style.display="none";
-}
-
-function downloadGame(e,file){
-e.stopPropagation();
-window.location=file;
-}
-
-function shareGame(e,name){
-e.stopPropagation();
-navigator.clipboard.writeText(name);
-alert("Game name copied");
-}
-
-buildCategories();
-renderGames();
 
 </script>
+
 </body>
 </html>
-:::
