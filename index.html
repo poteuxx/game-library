@@ -71,7 +71,7 @@ grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
 gap:24px;
 }
 
-/* Software slider */
+/* Software & Related sliders */
 .software-slider{
 display:flex;
 overflow-x:auto;
@@ -79,7 +79,6 @@ padding:20px 30px;
 gap:20px;
 scroll-behavior:smooth;
 }
-
 .software-slider::-webkit-scrollbar{
 height:8px;
 }
@@ -88,6 +87,7 @@ background:rgba(88,101,242,0.5);
 border-radius:4px;
 }
 
+/* Cards */
 .card{
 background:rgba(255,255,255,.05);
 border:1px solid rgba(255,255,255,.08);
@@ -97,26 +97,68 @@ transition:.4s;
 backdrop-filter:blur(12px);
 min-width:260px;
 flex-shrink:0;
+opacity:0;
+transform:translateY(20px);
 }
-
+.card.visible{
+opacity:1;
+transform:translateY(0);
+}
 .card:hover{
 transform:translateY(-10px) scale(1.03);
 border:1px solid #7380ff;
 box-shadow:0 15px 40px rgba(0,0,0,0.6);
 }
-
 .card img{
 width:100%;
 height:160px;
 object-fit:cover;
 }
-
 .content{ padding:18px; }
 .title{ font-size:19px; font-weight:700; }
 .desc{ font-size:13px; opacity:.75; margin-top:6px; }
 .players{ margin-top:8px; font-size:13px; color:#7aa2ff; }
 .tags{ margin-top:8px; font-size:12px; opacity:.6; background:rgba(88,101,242,0.2); padding:2px 6px; border-radius:6px; display:inline-block; }
 .btn{ margin-top:12px; display:inline-block; padding:10px 16px; border-radius:10px; font-size:14px; text-decoration:none; color:white; background:linear-gradient(135deg,#5865f2,#7380ff); }
+
+/* Tags cloud */
+.tag{
+cursor:pointer;
+margin-right:10px;
+padding:6px 10px;
+background:rgba(88,101,242,0.3);
+border-radius:8px;
+transition:.3s;
+display:inline-block;
+}
+.tag:hover{
+background:#5865f2;
+transform:scale(1.1);
+}
+
+/* Rating */
+.rating{
+margin-top:6px;
+font-size:14px;
+color:#f5b50a;
+}
+
+/* Modal */
+#gameModal{
+display:none;
+position:fixed;
+top:0; left:0;
+width:100%; height:100%;
+background:rgba(0,0,0,.85);
+align-items:center;
+justify-content:center;
+z-index:1000;
+}
+#gameModal video{
+width:100%;
+border-radius:12px;
+max-width:800px;
+}
 </style>
 </head>
 
@@ -136,10 +178,26 @@ object-fit:cover;
 </select>
 </div>
 
+<!-- Tags Cloud -->
+<div class="tags-cloud" style="padding:20px;text-align:center;">
+<span class="tag" onclick="filterByTag('cod')">COD</span>
+<span class="tag" onclick="filterByTag('battlefield')">Battlefield</span>
+<span class="tag" onclick="filterByTag('wow')">WoW</span>
+</div>
+
 <div class="grid" id="games"></div>
 
 <h2 style="padding-left:30px;">Featured Software</h2>
 <div class="software-slider" id="software"></div>
+
+<h2 style="padding-left:30px;">Related Games</h2>
+<div class="software-slider" id="relatedGames"></div>
+
+<!-- Modal for game previews -->
+<div id="gameModal">
+<video id="modalVideo" controls></video>
+<span style="position:absolute;top:20px;right:30px;font-size:30px;cursor:pointer;color:white;" onclick="closeModal()">×</span>
+</div>
 
 <script>
 // === Games ===
@@ -148,12 +206,14 @@ const games = [
 {name:"Call of Duty T4",desc:"World at War multiplayer build",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/10090/header.jpg",tag:"cod",link:"https://archive.org/download/co-dwa-w_202312/co-dwa-w_202312_archive.torrent"},
 {name:"Call of Duty T5",desc:"Black Ops multiplayer client",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/42700/header.jpg",tag:"cod",link:"https://archive.org/download/cod-bo1-t5-full-game/cod-bo1-t5-full-game_archive.torrent"},
 {name:"Call of Duty T6",desc:"Black Ops II community version",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/202970/header.jpg",tag:"cod",link:"https://archive.org/download/cod-bo2-t6-full-game/cod-bo2-t6-full-game_archive.torrent/"},
-{name:"Call of Duty T7",desc:"Black Ops III client",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/311210/header.jpg",tag:"cod",link:"https://archive.org/download/cod-bo3-t7-full-game/cod-bo3-t7-full-game.torrent"},
+{name:"Call of Duty T7",desc:"Black Ops III client",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/311210/header.jpg",tag:"cod",link:"https://archive.org/download/cod-bo3-t7-full-game.torrent"},
 {name:"Battlefield 2",desc:"Large scale battlefield combat",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/24860/header.jpg",tag:"battlefield",link:"https://archive.org/download/battle-field-2.zip/battle-field-2.zip_archive.torrent"},
 {name:"WoW Warmane",desc:"Wrath of the Lich King private server",img:"https://bnetcmsus-a.akamaihd.net/cms/blog_header/at/AT1NXBU8GUD11696972579475.png",tag:"wow",link:"magnet:?xt=urn:btih:5B65D1928A3025A820B45E6DB2451AAAABC5347C"},
 {name:"WoW Turtle",desc:"Vanilla+ WoW server",img:"https://wow.zamimg.com/uploads/screenshots/normal/944761.jpg",tag:"wow",link:"https://eudl.turtlecraft.gg/twmoa_1180.zip"},
 {name:"WoW ReShade HD",desc:"Enhanced graphics version",img:"https://sfx.thelazy.net/media/presetscreenshots/2020/07/04/Wow_2020-07-04_05-02-31.png",tag:"wow",link:"https://drive.google.com/file/d/1iQJ4iKDc7AW0HOKG58TcR05BtM64_th1/view"}
 ];
+
+// === Software ===
 const softwareList = [
   {name:"Discord", desc:"Chat & Voice platform", img:"https://abbygoldsmith.com/wp-content/uploads/2022/03/Discord-Logo-Color.png", link:"https://discord.com"},
   {name:"Steam", desc:"Game Store", img:"https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg", link:"https://store.steampowered.com"},
@@ -169,52 +229,90 @@ const softwareList = [
   {name:"Roblox C++/C# Library", desc:"C++/C# Lib rbx functions", img:"", link:""},
   {name:"Roblox C# Menu home", desc:"C#/C++ Connection Home menu", img:"", link:""}
 ];
+
 const grid = document.getElementById("games");
 const software = document.getElementById("software");
+const related = document.getElementById("relatedGames");
 
-// === Render Games ===
+// === Render Functions ===
 function renderGames(){
-grid.innerHTML="";
-const search = document.getElementById("search").value.toLowerCase();
-const filter = document.getElementById("filter").value;
-
-games
-.filter(g => (filter==="all" || g.tag===filter))
-.filter(g => g.name.toLowerCase().includes(search))
-.forEach(g=>{
-const players = Math.floor(Math.random()*5000)+200;
-const card = document.createElement("div");
-card.className="card";
-card.innerHTML = `
-<img src="${g.img}">
-<div class="content">
-<div class="title">${g.name}</div>
-<div class="desc">${g.desc}</div>
-<div class="players">Online Players: ${players}</div>
-<div class="tags">${g.tag.toUpperCase()}</div>
-<a class="btn" href="${g.link}" target="_blank">Download</a>
-</div>
-`;
-grid.appendChild(card);
-});
+    grid.innerHTML="";
+    const search = document.getElementById("search").value.toLowerCase();
+    const filter = document.getElementById("filter").value;
+    
+    games
+    .filter(g => (filter==="all" || g.tag===filter))
+    .filter(g => g.name.toLowerCase().includes(search))
+    .forEach(g=>{
+        const players = Math.floor(Math.random()*5000)+200; // placeholder for live player counts
+        const card = document.createElement("div");
+        card.className="card";
+        card.innerHTML = `
+        <img src="${g.img}">
+        <div class="content">
+            <div class="title">${g.name}</div>
+            <div class="desc">${g.desc}</div>
+            <div class="players">Online Players: ${players}</div>
+            <div class="tags">${g.tag.toUpperCase()}</div>
+            <div class="rating">⭐️⭐️⭐️⭐️☆</div>
+            <a class="btn" href="${g.link}" target="_blank">Download</a>
+            <a class="btn" onclick="openModal('https://cdn.cloudflare.steamstatic.com/steam/apps/10190/header.jpg')">Preview</a>
+        </div>`;
+        grid.appendChild(card);
+        observer.observe(card); // animate fade in
+    });
 }
 
-// === Render Software Slider ===
 function renderSoftware(){
-software.innerHTML="";
-softwareList.forEach(s=>{
-const card = document.createElement("div");
-card.className="card";
-card.innerHTML = `
-<img src="${s.img}">
-<div class="content">
-<div class="title">${s.name}</div>
-<div class="desc">${s.desc}</div>
-<a class="btn" href="${s.link}" target="_blank">Visit</a>
-</div>
-`;
-software.appendChild(card);
-});
+    software.innerHTML="";
+    softwareList.forEach(s=>{
+        const card = document.createElement("div");
+        card.className="card";
+        card.innerHTML = `
+        <img src="${s.img}">
+        <div class="content">
+            <div class="title">${s.name}</div>
+            <div class="desc">${s.desc}</div>
+            <a class="btn" href="${s.link}" target="_blank">Visit</a>
+        </div>`;
+        software.appendChild(card);
+        observer.observe(card);
+    });
+}
+
+function renderRelatedGames(currentTag="cod"){
+    const relatedGames = games.filter(g=>g.tag===currentTag).slice(0,5);
+    related.innerHTML="";
+    relatedGames.forEach(g=>{
+        const card = document.createElement("div");
+        card.className="card";
+        card.innerHTML = `
+        <img src="${g.img}">
+        <div class="content">
+            <div class="title">${g.name}</div>
+            <div class="desc">${g.desc}</div>
+            <a class="btn" href="${g.link}" target="_blank">Download</a>
+        </div>`;
+        related.appendChild(card);
+        observer.observe(card);
+    });
+}
+
+// Tag filter helper
+function filterByTag(tag){
+    document.getElementById("filter").value = tag;
+    renderGames();
+    renderRelatedGames(tag);
+}
+
+// Modal
+function openModal(videoUrl){
+    document.getElementById("modalVideo").src = videoUrl;
+    document.getElementById("gameModal").style.display = "flex";
+}
+function closeModal(){
+    document.getElementById("gameModal").style.display = "none";
+    document.getElementById("modalVideo").src = "";
 }
 
 // Event Listeners
@@ -224,8 +322,16 @@ document.getElementById("filter").onchange = renderGames;
 // Initial Render
 renderGames();
 renderSoftware();
+renderRelatedGames();
 
-/* Particles */
+// === Fade-in Observer ===
+const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+        if(e.isIntersecting) e.target.classList.add("visible");
+    });
+},{threshold:0.1});
+
+// === Particles ===
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
@@ -233,22 +339,21 @@ canvas.height = window.innerHeight;
 
 const particles = [];
 for(let i=0;i<80;i++){
-particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2+1,dx:(Math.random()-.5)*.5,dy:(Math.random()-.5)*.5});
+    particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2+1,dx:(Math.random()-.5)*.5,dy:(Math.random()-.5)*.5});
 }
-
 function animate(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-particles.forEach(p=>{
-p.x+=p.dx;
-p.y+=p.dy;
-if(p.x<0||p.x>canvas.width)p.dx*=-1;
-if(p.y<0||p.y>canvas.height)p.dy*=-1;
-ctx.beginPath();
-ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-ctx.fillStyle="rgba(120,140,255,.7)";
-ctx.fill();
-});
-requestAnimationFrame(animate);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+        p.x+=p.dx;
+        p.y+=p.dy;
+        if(p.x<0||p.x>canvas.width)p.dx*=-1;
+        if(p.y<0||p.y>canvas.height)p.dy*=-1;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle="rgba(120,140,255,.7)";
+        ctx.fill();
+    });
+    requestAnimationFrame(animate);
 }
 animate();
 
