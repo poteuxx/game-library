@@ -3,165 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Community Hub Game Library</title>
+<title>Community Hub Game & Software Library</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
 <style>
-*{
-  box-sizing:border-box;
-}
-body{
-  margin:0;
-  font-family:Inter, sans-serif;
-  background:#0b0f17;
-  color:white;
-  overflow-x:hidden;
-}
-canvas{
-  position:fixed;
-  top:0;
-  left:0;
-  z-index:-1;
-}
-
-/* Animated 3D Header */
-header{
-  padding:30px;
-  text-align:center;
-  font-size:52px;
-  font-weight:800;
-  letter-spacing:2px;
-  color:#ffffff;
-  text-shadow:
-    1px 1px 0 #5b7cff,
-    2px 2px 0 #4b6fdd,
-    3px 3px 0 #3b59bb,
-    4px 4px 0 #2b4399,
-    5px 5px 0 #1b2d77;
+/* --- Keep all your previous styles exactly --- */
+*{ box-sizing:border-box; }
+body{ margin:0; font-family:Inter, sans-serif; background:#0b0f17; color:white; overflow:hidden; }
+canvas{ position:fixed; top:0; left:0; z-index:-1; }
+header{ padding:30px; text-align:center; font-size:52px; font-weight:800; letter-spacing:2px; color:#ffffff;
+  text-shadow:1px 1px 0 #5b7cff,2px 2px 0 #4b6fdd,3px 3px 0 #3b59bb,4px 4px 0 #2b4399,5px 5px 0 #1b2d77;
   background: linear-gradient(90deg, #5865f2, #7380ff, #5b7cff, #5865f2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientShift 5s infinite linear, pulse 2s infinite ease-in-out;
-  display:inline-block;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  animation: gradientShift 5s infinite linear, pulse 2s infinite ease-in-out; display:inline-block;
 }
-@keyframes gradientShift {
-  0% {background-position: 0%;}
-  50% {background-position: 100%;}
-  100% {background-position: 0%;}
-}
-@keyframes pulse {
-  0%, 100% {transform: scale(1);}
-  50% {transform: scale(1.05);}
-}
+@keyframes gradientShift { 0% {background-position: 0%;} 50% {background-position: 100%;} 100% {background-position: 0%;} }
+@keyframes pulse { 0%,100% {transform: scale(1);} 50% {transform: scale(1.05);} }
 
-/* Controls - Modern UI */
-.controls{
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:15px;
-  padding:20px;
-  backdrop-filter:blur(15px);
-  background:rgba(20,25,40,0.6);
-  border-radius:12px;
-  margin:20px auto;
-  max-width:800px;
+.controls{ display:flex; justify-content:center; flex-wrap:wrap; gap:15px; padding:20px; backdrop-filter:blur(15px);
+  background:rgba(20,25,40,0.6); border-radius:12px; margin:20px auto; max-width:800px;
 }
-input, select{
-  padding:12px 16px;
-  border-radius:10px;
-  border:none;
-  outline:none;
-  font-size:14px;
-  background:rgba(255,255,255,0.05);
-  color:white;
-  backdrop-filter:blur(10px);
-  transition:.3s;
+input, select{ padding:12px 16px; border-radius:10px; border:none; outline:none; font-size:14px; 
+  background:rgba(255,255,255,0.05); color:white; backdrop-filter:blur(10px); transition:.3s;
 }
-input:focus, select:focus{
-  background:rgba(88,101,242,0.2);
-  box-shadow:0 0 15px rgba(88,101,242,0.5);
-}
+input:focus, select:focus{ background:rgba(88,101,242,0.2); box-shadow:0 0 15px rgba(88,101,242,0.5); }
 
-/* Grid & Cards */
-.grid{
-  padding:30px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:24px;
+.grid{ padding:30px; display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:24px; }
+.card{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-radius:16px; overflow:hidden;
+  transition:.4s; backdrop-filter:blur(12px); position:relative;
 }
-.card{
-  background:rgba(255,255,255,.05);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:16px;
-  overflow:hidden;
-  transition:.4s;
-  backdrop-filter:blur(12px);
-  position:relative;
+.card:hover{ transform:translateY(-10px) scale(1.03); border:1px solid #7380ff; box-shadow:0 15px 40px rgba(0,0,0,0.6); }
+.card img{ width:100%; height:160px; object-fit:cover; transition:.3s; }
+.card:hover img{ transform:scale(1.05); }
+.content{ padding:18px; }
+.title{ font-size:19px; font-weight:700; color:#fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+.desc{ font-size:13px; opacity:.75; margin-top:6px; }
+.players{ margin-top:8px; font-size:13px; color:#7aa2ff; }
+.tags{ margin-top:8px; font-size:12px; opacity:.6; background:rgba(88,101,242,0.2); padding:2px 6px; border-radius:6px; display:inline-block; }
+.btn{ margin-top:12px; display:inline-block; padding:10px 16px; border-radius:10px; font-size:14px; text-decoration:none; color:white;
+  background:linear-gradient(135deg,#5865f2,#7380ff); transition:.3s; box-shadow:0 5px 15px rgba(88,101,242,0.3);
 }
-.card:hover{
-  transform:translateY(-10px) scale(1.03);
-  border:1px solid #7380ff;
-  box-shadow:0 15px 40px rgba(0,0,0,0.6);
-}
-.card img{
-  width:100%;
-  height:160px;
-  object-fit:cover;
-  transition:.3s;
-}
-.card:hover img{
-  transform:scale(1.05);
-}
-.content{
-  padding:18px;
-}
-.title{
-  font-size:19px;
-  font-weight:700;
-  color:#fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-}
-.desc{
-  font-size:13px;
-  opacity:.75;
-  margin-top:6px;
-}
-.players{
-  margin-top:8px;
-  font-size:13px;
-  color:#7aa2ff;
-}
-.tags{
-  margin-top:8px;
-  font-size:12px;
-  opacity:.6;
-  background:rgba(88,101,242,0.2);
-  padding:2px 6px;
-  border-radius:6px;
-  display:inline-block;
-}
+.btn:hover{ background:linear-gradient(135deg,#7380ff,#5865f2); box-shadow:0 8px 20px rgba(88,101,242,0.5); }
 
-/* Buttons - Modern */
-.btn{
-  margin-top:12px;
-  display:inline-block;
-  padding:10px 16px;
-  border-radius:10px;
-  font-size:14px;
-  text-decoration:none;
-  color:white;
-  background:linear-gradient(135deg,#5865f2,#7380ff);
-  transition:.3s;
-  box-shadow:0 5px 15px rgba(88,101,242,0.3);
-}
-.btn:hover{
-  background:linear-gradient(135deg,#7380ff,#5865f2);
-  box-shadow:0 8px 20px rgba(88,101,242,0.5);
-}
-
+/* sliding pages */
+.page-container{ display:flex; width:200%; transition:transform 0.5s ease; }
+.page{ width:100vw; flex-shrink:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:24px; }
+.page-indicator{text-align:center; margin:10px 0;}
+.dot{ display:inline-block; width:10px; height:10px; margin:0 5px; background:#5865f2; border-radius:50%; transition:.3s; opacity:.5; }
+.dot.active{ opacity:1; }
 </style>
 </head>
 
@@ -174,15 +65,24 @@ input:focus, select:focus{
   <input id="search" placeholder="Search games...">
   <select id="filter">
     <option value="all">All</option>
-    <option value="cod">Call of Duty</option>
-    <option value="battlefield">Battlefield</option>
-    <option value="wow">World of Warcraft</option>
+    <option value="games">Games</option>
+    <option value="software">Software</option>
   </select>
 </div>
 
-<div class="grid" id="games"></div>
+<!-- Sliding pages -->
+<div class="page-container" id="pageContainer">
+  <div class="page" id="gamesPage"></div>
+  <div class="page" id="softwarePage"></div>
+</div>
+
+<div class="page-indicator">
+  <span class="dot active"></span>
+  <span class="dot"></span>
+</div>
 
 <script>
+/* --- KEEP YOUR ORIGINAL GAMES ARRAY EXACTLY --- */
 const games = [
   {name:"IW4x", desc:"Modern Warfare 2 community multiplayer client", img:"https://cdn.cloudflare.steamstatic.com/steam/apps/10190/header.jpg", tag:"cod", link:"https://archive.org/download/iw4x_full_game.rar/iw4x_full_game.rar_archive.torrent"},
   {name:"Call of Duty T4", desc:"World at War multiplayer build", img:"https://cdn.cloudflare.steamstatic.com/steam/apps/10090/header.jpg", tag:"cod", link:"https://archive.org/download/co-dwa-w_202312/co-dwa-w_202312_archive.torrent"},
@@ -195,67 +95,84 @@ const games = [
   {name:"WoW ReShade HD", desc:"Enhanced graphics version", img:"https://sfx.thelazy.net/media/presetscreenshots/2020/07/04/Wow_2020-07-04_05-02-31.png", tag:"wow", link:"https://drive.google.com/file/d/1iQJ4iKDc7AW0HOKG58TcR05BtM64_th1/view?usp=drive_link"}
 ];
 
-const grid = document.getElementById("games");
+/* --- NEW SOFTWARE ARRAY --- */
+const software = [
+  {name:"MySoftware1", desc:"Custom tool by me", img:"https://via.placeholder.com/260x160.png?text=Software+1", tag:"software", link:"#"},
+  {name:"MySoftware2", desc:"Custom tool by me", img:"https://via.placeholder.com/260x160.png?text=Software+2", tag:"software", link:"#"}
+];
 
-function render(){
-  grid.innerHTML="";
-  const search = document.getElementById("search").value.toLowerCase();
-  const filter = document.getElementById("filter").value;
+const gamesPage = document.getElementById("gamesPage");
+const softwarePage = document.getElementById("softwarePage");
 
-  games
-  .filter(g=> (filter==="all" || g.tag===filter))
-  .filter(g=> g.name.toLowerCase().includes(search))
-  .forEach(g=>{
-    const players = Math.floor(Math.random()*5000)+200;
+/* --- Populate pages --- */
+function populatePage(pageElement, items){
+  pageElement.innerHTML="";
+  items.forEach(item=>{
+    const players = item.tag==="games"? Math.floor(Math.random()*5000)+200 : null;
     const card = document.createElement("div");
     card.className="card";
     card.innerHTML=`
-      <img src="${g.img}">
+      <img src="${item.img}">
       <div class="content">
-        <div class="title">${g.name}</div>
-        <div class="desc">${g.desc}</div>
-        <div class="players">Online Players: ${players}</div>
-        <div class="tags">${g.tag.toUpperCase()}</div>
-        <a class="btn" href="${g.link}" target="_blank">Download</a>
+        <div class="title">${item.name}</div>
+        <div class="desc">${item.desc}</div>
+        ${players ? `<div class="players">Online Players: ${players}</div>` : ""}
+        <div class="tags">${item.tag.toUpperCase()}</div>
+        <a class="btn" href="${item.link}" target="_blank">Open</a>
       </div>
     `;
-    grid.appendChild(card);
+    pageElement.appendChild(card);
   });
 }
 
-document.getElementById("search").oninput = render;
-document.getElementById("filter").onchange = render;
+populatePage(gamesPage,games);
+populatePage(softwarePage,software);
 
-render();
+/* --- SEARCH/FILTER --- */
+document.getElementById("search").oninput = filterItems;
+document.getElementById("filter").onchange = filterItems;
 
-/* particles */
+function filterItems(){
+  const search = document.getElementById("search").value.toLowerCase();
+  const filter = document.getElementById("filter").value;
+  [gamesPage, softwarePage].forEach(page=>{
+    Array.from(page.children).forEach(card=>{
+      const name = card.querySelector(".title").textContent.toLowerCase();
+      const tag = card.querySelector(".tags").textContent.toLowerCase();
+      card.style.display = (name.includes(search) && (filter==="all" || tag===filter))?"block":"none";
+    });
+  });
+}
+
+/* --- PAGE SLIDE --- */
+let currentPage=0;
+const pageContainer=document.getElementById("pageContainer");
+const dots=document.querySelectorAll(".dot");
+function showPage(index){
+  currentPage=Math.max(0,Math.min(index,dots.length-1));
+  pageContainer.style.transform=`translateX(-${currentPage*100}vw)`;
+  dots.forEach((d,i)=>d.classList.toggle("active",i===currentPage));
+}
+dots.forEach((dot,i)=>dot.addEventListener("click",()=>showPage(i)));
+
+/* --- PARTICLES --- */
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
 const particles = [];
-for(let i=0;i<80;i++){
-  particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*2+1, dx:(Math.random()-.5)*.5, dy:(Math.random()-.5)*.5});
-}
+for(let i=0;i<80;i++){ particles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*2+1, dx:(Math.random()-.5)*.5, dy:(Math.random()-.5)*.5}); }
 function animate(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
   particles.forEach(p=>{
-    p.x+=p.dx;
-    p.y+=p.dy;
-    if(p.x<0||p.x>canvas.width) p.dx*=-1;
-    if(p.y<0||p.y>canvas.height) p.dy*=-1;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle="rgba(120,140,255,.7)";
-    ctx.fill();
+    p.x+=p.dx; p.y+=p.dy;
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle="rgba(120,140,255,.7)"; ctx.fill();
   });
   requestAnimationFrame(animate);
 }
 animate();
-window.onresize=()=>{
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
-}
+window.onresize=()=>{canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
 </script>
 
 </body>
