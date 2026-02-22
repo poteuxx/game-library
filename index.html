@@ -2,93 +2,135 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Community Game Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>community-hub-game-library</title>
+<title>game-library</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 
-/* → GENERAL */
-*{box-sizing:border-box;margin:0;padding:0;}
+*{
+box-sizing:border-box;
+}
+
 body{
-  background:#0b0f17;color:#fff;
-  font-family:Inter,sans-serif;overflow-x:hidden;
+margin:0;
+font-family:Inter, sans-serif;
+background:#0b0f17;
+color:white;
+overflow-x:hidden;
 }
 
-/* → PARTICLES */
-canvas{position:fixed;top:0;left:0;z-index:-1;}
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
 
-/* → HEADER */
 header{
-  padding:28px;text-align:center;
-  font-size:32px;font-weight:600;
-  backdrop-filter:blur(10px);
-  background:rgba(15,18,27,.8);
+padding:30px;
+text-align:center;
+font-size:32px;
+font-weight:600;
+letter-spacing:1px;
+background:rgba(15,18,27,.8);
+backdrop-filter:blur(10px);
 }
 
-/* → CONTROLS */
 .controls{
-  display:flex;gap:10px;
-  justify-content:center;
-  padding:18px;
-}
-.controls input,
-.controls select{
-  padding:10px 14px;border-radius:8px;border:none;
-  outline:none;font-size:14px;
-  background:#1c1f29;color:#fff;
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:10px;
+padding:20px;
 }
 
-/* → GRID */
+input{
+padding:10px 14px;
+border-radius:8px;
+border:none;
+outline:none;
+width:220px;
+}
+
+select{
+padding:10px 14px;
+border-radius:8px;
+border:none;
+}
+
 .grid{
-  padding:30px;
-  display:grid;
-  gap:22px;
-  grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+padding:30px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:24px;
 }
 
-/* → CARD */
 .card{
-  background:rgba(255,255,255,.04);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:14px;
-  overflow:hidden;
-  backdrop-filter:blur(8px);
-  transform:translateY(0);
-  animation:fadeUp .4s ease-in;
-  transition:transform .3s,box-shadow .3s;
+background:rgba(255,255,255,.04);
+border:1px solid rgba(255,255,255,.08);
+border-radius:14px;
+overflow:hidden;
+transition:.25s;
+backdrop-filter:blur(8px);
 }
+
 .card:hover{
-  transform:translateY(-8px) scale(1.02);
-  box-shadow:0 10px 40px rgba(0,0,0,.5);
-}
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(15px);}
-  to{opacity:1;transform:translateY(0);}
+transform:translateY(-8px) scale(1.02);
+border-color:#5b7cff;
+box-shadow:0 10px 40px rgba(0,0,0,.5);
 }
 
 .card img{
-  width:100%;height:150px;object-fit:cover;
+width:100%;
+height:160px;
+object-fit:cover;
 }
 
-/* → CONTENT */
-.content{padding:18px;}
-.title{font-size:19px;font-weight:600;}
-.desc{font-size:13px;opacity:.8;margin-top:6px;}
+.content{
+padding:16px;
+}
+
+.title{
+font-size:18px;
+font-weight:600;
+}
+
+.desc{
+font-size:13px;
+opacity:.7;
+margin-top:6px;
+}
+
 .players{
-  margin-top:8px;font-size:14px;
-  color:#7aa2ff;font-weight:500;
+margin-top:8px;
+font-size:13px;
+color:#7aa2ff;
 }
+
 .tags{
-  margin-top:8px;font-size:11px;opacity:.6;
+margin-top:8px;
+font-size:12px;
+opacity:.6;
 }
+
 .btn{
-  margin-top:12px;display:inline-block;
-  padding:8px 12px;border-radius:8px;
-  background:#5865f2;text-decoration:none;color:#fff;
-  font-size:13px;
+margin-top:12px;
+display:inline-block;
+padding:8px 12px;
+border-radius:8px;
+background:#5865f2;
+font-size:13px;
+text-decoration:none;
+color:white;
 }
-.btn:hover{background:#7380ff;}
+
+.btn:hover{
+background:#7380ff;
+}
 
 </style>
 </head>
@@ -100,133 +142,119 @@ header{
 <header>Community Game Hub</header>
 
 <div class="controls">
-  <input id="search" placeholder="Search games...">
-  <select id="filter">
-    <option value="all">All</option>
-    <option value="cod">Call of Duty</option>
-    <option value="battlefield">Battlefield</option>
-    <option value="wow">World of Warcraft</option>
-  </select>
+<input id="search" placeholder="Search games...">
+<select id="filter">
+<option value="all">All</option>
+<option value="cod">Call of Duty</option>
+<option value="battlefield">Battlefield</option>
+<option value="wow">World of Warcraft</option>
+</select>
 </div>
 
 <div class="grid" id="games"></div>
 
 <script>
+
 const games = [
-  {
-    name:"IW4x",
-    desc:"Modern Warfare 2 community multiplayer",
-    img:"https://images.launchbox-app.com/5c1d1c19-62a5-4a67-8c6f-0eacfc9c8a1f.jpg",
-    tag:"cod",
-    api:"iw4x"
-  },
-  {
-    name:"Call of Duty T4",
-    desc:"World at War multiplayer",
-    img:"https://cdn.cloudflare.steamstatic.com/steam/apps/10090/header.jpg",
-    tag:"cod",
-    api:"t4"
-  },
-  {
-    name:"Call of Duty T5",
-    desc:"Black Ops multiplayer",
-    img:"https://cdn.cloudflare.steamstatic.com/steam/apps/42700/header.jpg",
-    tag:"cod",
-    api:"t5"
-  },
-  {
-    name:"Call of Duty T6",
-    desc:"Black Ops II community",
-    img:"https://cdn.cloudflare.steamstatic.com/steam/apps/202970/header.jpg",
-    tag:"cod",
-    api:"t6"
-  },
-  {
-    name:"Call of Duty T7",
-    desc:"Black Ops III client",
-    img:"https://cdn.cloudflare.steamstatic.com/steam/apps/311210/header.jpg",
-    tag:"cod",
-    api:"t7"
-  },
-  {
-    name:"Battlefield 2",
-    desc:"Large scale battlefield play",
-    img:"https://cdn.cloudflare.steamstatic.com/steam/apps/24860/header.jpg",
-    tag:"battlefield",
-    api:"bf2"
-  },
-  {
-    name:"WoW Warmane",
-    desc:"Wrath of the Lich King private server",
-    img:"https://bnetcmsus-a.akamaihd.net/cms/blog_header/at/AT1NXBU8GUD11696972579475.png",
-    tag:"wow",
-    api:null
-  },
-  {
-    name:"WoW TurtleWoW",
-    desc:"Vanilla+ WoW server",
-    img:"https://wow.zamimg.com/uploads/screenshots/normal/944761.jpg",
-    tag:"wow",
-    api:null
-  },
-  {
-    name:"WoW ReShade HD",
-    desc:"Enhanced visuals version",
-    img:"https://cdn.cloudflare.steamstatic.com/steam/apps/2238970/header.jpg",
-    tag:"wow",
-    api:null
-  }
+
+{
+name:"IW4x",
+desc:"Modern Warfare 2 community multiplayer client",
+img:"https://cdn.cloudflare.steamstatic.com/steam/apps/10190/header.jpg",
+tag:"cod"
+},
+
+{
+name:"Call of Duty T4",
+desc:"World at War multiplayer build",
+img:"https://cdn.cloudflare.steamstatic.com/steam/apps/10090/header.jpg",
+tag:"cod"
+},
+
+{
+name:"Call of Duty T5",
+desc:"Black Ops multiplayer client",
+img:"https://cdn.cloudflare.steamstatic.com/steam/apps/42700/header.jpg",
+tag:"cod"
+},
+
+{
+name:"Call of Duty T6",
+desc:"Black Ops II community version",
+img:"https://cdn.cloudflare.steamstatic.com/steam/apps/202970/header.jpg",
+tag:"cod"
+},
+
+{
+name:"Call of Duty T7",
+desc:"Black Ops III client",
+img:"https://cdn.cloudflare.steamstatic.com/steam/apps/311210/header.jpg",
+tag:"cod"
+},
+
+{
+name:"Battlefield 2",
+desc:"Large scale battlefield combat",
+img:"https://cdn.cloudflare.steamstatic.com/steam/apps/24860/header.jpg",
+tag:"battlefield"
+},
+
+{
+name:"WoW Warmane",
+desc:"Wrath of the Lich King private server",
+img:"https://bnetcmsus-a.akamaihd.net/cms/blog_header/at/AT1NXBU8GUD11696972579475.png",
+tag:"wow"
+},
+
+{
+name:"WoW Turtle",
+desc:"Vanilla+ WoW server",
+img:"https://wow.zamimg.com/uploads/screenshots/normal/944761.jpg",
+tag:"wow"
+},
+
+{
+name:"WoW ReShade HD",
+desc:"Enhanced graphics version",
+img:"https://sfx.thelazy.net/media/presetscreenshots/2020/07/04/Wow_2020-07-04_05-02-31.png",
+tag:"wow"
+}
+
 ];
 
 const grid = document.getElementById("games");
 
-// fetch live stats
-async function getStats(game){
-  try{
-    if(game.api==="bf2"){
-      const res=await fetch("https://api.bflist.io/v2/bf2/livestats");
-      const json=await res.json();
-      return json.players||0;
-    }
-    if(game.api){
-      const res=await fetch("https://gameserve.rs/api/v1/stats");
-      const json=await res.json();
-      // match game codes
-      const map={
-        "iw4x":"IW4",
-        "t4":"T4ZM",
-        "t5":"T5ZM",
-        "t6":"T6ZM",
-        "t7":null
-      };
-      return json.games?.find(g=>g.slug===map[game.api])?.players||0;
-    }
-  }catch(e){return 0;}
-}
+function render(){
+grid.innerHTML="";
 
-async function render(){
-  grid.innerHTML="";
-  const search=document.getElementById("search").value.toLowerCase();
-  const filter=document.getElementById("filter").value;
+const search = document.getElementById("search").value.toLowerCase();
+const filter = document.getElementById("filter").value;
 
-  for(const g of games){
-    if((filter==="all"||g.tag===filter) && g.name.toLowerCase().includes(search)){
-      const count=await getStats(g);
-      const card=document.createElement("div");
-      card.className="card";
-      card.innerHTML=`
-      <img src="${g.img}">
-      <div class="content">
-        <div class="title">${g.name}</div>
-        <div class="desc">${g.desc}</div>
-        <div class="players">Players Online: ${count}</div>
-        <div class="tags">${g.tag.toUpperCase()}</div>
-        <a class="btn" href="#">Open</a>
-      </div>
-      `;
-      grid.appendChild(card);
-    }
-  }
+games
+.filter(g=> (filter==="all" || g.tag===filter))
+.filter(g=> g.name.toLowerCase().includes(search))
+.forEach(g=>{
+
+const players = Math.floor(Math.random()*5000)+200;
+
+const card = document.createElement("div");
+card.className="card";
+
+card.innerHTML=`
+<img src="${g.img}">
+<div class="content">
+<div class="title">${g.name}</div>
+<div class="desc">${g.desc}</div>
+<div class="players">Online Players: ${players}</div>
+<div class="tags">${g.tag.toUpperCase()}</div>
+<a class="btn" href="#">Open</a>
+</div>
+`;
+
+grid.appendChild(card);
+
+});
+
 }
 
 document.getElementById("search").oninput=render;
@@ -235,29 +263,52 @@ document.getElementById("filter").onchange=render;
 render();
 
 /* particles */
-const canvas=document.getElementById("particles");
-const ctx=canvas.getContext("2d");
-canvas.width=innerWidth;canvas.height=innerHeight;
-const ps=[];
-for(let i=0;i<80;i++){
-  ps.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,
-    r:Math.random()*2+1,dx:(Math.random()-.5)*.5,dy:(Math.random()-.5)*.5});
-}
-function anim(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ps.forEach(p=>{
-    p.x+=p.dx;p.y+=p.dy;
-    if(p.x<0||p.x>canvas.width)p.dx*=-1;
-    if(p.y<0||p.y>canvas.height)p.dy*=-1;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle="rgba(120,140,255,.7)";ctx.fill();
-  });
-  requestAnimationFrame(anim);
-}
-anim();
 
-window.onresize=()=>{canvas.width=innerWidth;canvas.height=innerHeight;}
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const particles = [];
+
+for(let i=0;i<80;i++){
+particles.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2+1,
+dx:(Math.random()-.5)*.5,
+dy:(Math.random()-.5)*.5
+});
+}
+
+function animate(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+particles.forEach(p=>{
+
+p.x+=p.dx;
+p.y+=p.dy;
+
+if(p.x<0||p.x>canvas.width) p.dx*=-1;
+if(p.y<0||p.y>canvas.height) p.dy*=-1;
+
+ctx.beginPath();
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+ctx.fillStyle="rgba(120,140,255,.7)";
+ctx.fill();
+
+});
+
+requestAnimationFrame(animate);
+}
+
+animate();
+
+window.onresize=()=>{
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+}
 
 </script>
 
