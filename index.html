@@ -29,16 +29,8 @@ animation: gradientShift 5s infinite linear,pulse 2s infinite ease-in-out;
 display:inline-block;
 }
 
-@keyframes gradientShift{
-0%{background-position:0%;}
-50%{background-position:100%;}
-100%{background-position:0%;}
-}
-
-@keyframes pulse{
-0%,100%{transform:scale(1);}
-50%{transform:scale(1.05);}
-}
+@keyframes gradientShift{0%{background-position:0%;}50%{background-position:100%;}100%{background-position:0%;}}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
 
 /* Controls */
 .controls{
@@ -79,6 +71,23 @@ grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
 gap:24px;
 }
 
+/* Software slider */
+.software-slider{
+display:flex;
+overflow-x:auto;
+padding:20px 30px;
+gap:20px;
+scroll-behavior:smooth;
+}
+
+.software-slider::-webkit-scrollbar{
+height:8px;
+}
+.software-slider::-webkit-scrollbar-thumb{
+background:rgba(88,101,242,0.5);
+border-radius:4px;
+}
+
 .card{
 background:rgba(255,255,255,.05);
 border:1px solid rgba(255,255,255,.08);
@@ -86,6 +95,8 @@ border-radius:16px;
 overflow:hidden;
 transition:.4s;
 backdrop-filter:blur(12px);
+min-width:260px;
+flex-shrink:0;
 }
 
 .card:hover{
@@ -101,44 +112,11 @@ object-fit:cover;
 }
 
 .content{ padding:18px; }
-
-.title{
-font-size:19px;
-font-weight:700;
-}
-
-.desc{
-font-size:13px;
-opacity:.75;
-margin-top:6px;
-}
-
-.players{
-margin-top:8px;
-font-size:13px;
-color:#7aa2ff;
-}
-
-.tags{
-margin-top:8px;
-font-size:12px;
-opacity:.6;
-background:rgba(88,101,242,0.2);
-padding:2px 6px;
-border-radius:6px;
-display:inline-block;
-}
-
-.btn{
-margin-top:12px;
-display:inline-block;
-padding:10px 16px;
-border-radius:10px;
-font-size:14px;
-text-decoration:none;
-color:white;
-background:linear-gradient(135deg,#5865f2,#7380ff);
-}
+.title{ font-size:19px; font-weight:700; }
+.desc{ font-size:13px; opacity:.75; margin-top:6px; }
+.players{ margin-top:8px; font-size:13px; color:#7aa2ff; }
+.tags{ margin-top:8px; font-size:12px; opacity:.6; background:rgba(88,101,242,0.2); padding:2px 6px; border-radius:6px; display:inline-block; }
+.btn{ margin-top:12px; display:inline-block; padding:10px 16px; border-radius:10px; font-size:14px; text-decoration:none; color:white; background:linear-gradient(135deg,#5865f2,#7380ff); }
 </style>
 </head>
 
@@ -160,8 +138,11 @@ background:linear-gradient(135deg,#5865f2,#7380ff);
 
 <div class="grid" id="games"></div>
 
-<script>
+<h2 style="padding-left:30px;">Featured Software</h2>
+<div class="software-slider" id="software"></div>
 
+<script>
+// === Games ===
 const games = [
 {name:"IW4x",desc:"Modern Warfare 2 community multiplayer client",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/10190/header.jpg",tag:"cod",link:"https://archive.org/download/iw4x_full_game.rar/iw4x_full_game.rar_archive.torrent"},
 {name:"Call of Duty T4",desc:"World at War multiplayer build",img:"https://cdn.cloudflare.steamstatic.com/steam/apps/10090/header.jpg",tag:"cod",link:"https://archive.org/download/co-dwa-w_202312/co-dwa-w_202312_archive.torrent"},
@@ -174,12 +155,20 @@ const games = [
 {name:"WoW ReShade HD",desc:"Enhanced graphics version",img:"https://sfx.thelazy.net/media/presetscreenshots/2020/07/04/Wow_2020-07-04_05-02-31.png",tag:"wow",link:"https://drive.google.com/file/d/1iQJ4iKDc7AW0HOKG58TcR05BtM64_th1/view"}
 ];
 
+const softwareList = [
+{name:"Discord",desc:"Chat & Voice platform",img:"https://upload.wikimedia.org/wikipedia/commons/7/7e/Discord_logo_2015.svg",link:"https://discord.com"},
+{name:"Steam",desc:"Game Store",img:"https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg",link:"https://store.steampowered.com"},
+{name:"OBS Studio",desc:"Streaming software",img:"https://upload.wikimedia.org/wikipedia/commons/3/3c/OBS_Logo.png",link:"https://obsproject.com"},
+{name:"Blender",desc:"3D Modeling",img:"https://upload.wikimedia.org/wikipedia/commons/0/05/Blender_Logo.svg",link:"https://blender.org"},
+{name:"VS Code",desc:"Code Editor",img:"https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg",link:"https://code.visualstudio.com"}
+];
+
 const grid = document.getElementById("games");
+const software = document.getElementById("software");
 
-function render(){
-
+// === Render Games ===
+function renderGames(){
 grid.innerHTML="";
-
 const search = document.getElementById("search").value.toLowerCase();
 const filter = document.getElementById("filter").value;
 
@@ -187,12 +176,9 @@ games
 .filter(g => (filter==="all" || g.tag===filter))
 .filter(g => g.name.toLowerCase().includes(search))
 .forEach(g=>{
-
 const players = Math.floor(Math.random()*5000)+200;
-
 const card = document.createElement("div");
 card.className="card";
-
 card.innerHTML = `
 <img src="${g.img}">
 <div class="content">
@@ -203,59 +189,64 @@ card.innerHTML = `
 <a class="btn" href="${g.link}" target="_blank">Download</a>
 </div>
 `;
-
 grid.appendChild(card);
-
 });
-
 }
 
-document.getElementById("search").oninput = render;
-document.getElementById("filter").onchange = render;
+// === Render Software Slider ===
+function renderSoftware(){
+software.innerHTML="";
+softwareList.forEach(s=>{
+const card = document.createElement("div");
+card.className="card";
+card.innerHTML = `
+<img src="${s.img}">
+<div class="content">
+<div class="title">${s.name}</div>
+<div class="desc">${s.desc}</div>
+<a class="btn" href="${s.link}" target="_blank">Visit</a>
+</div>
+`;
+software.appendChild(card);
+});
+}
 
-render();
+// Event Listeners
+document.getElementById("search").oninput = renderGames;
+document.getElementById("filter").onchange = renderGames;
 
-/* particles */
+// Initial Render
+renderGames();
+renderSoftware();
 
+/* Particles */
 const canvas = document.getElementById("particles");
 const ctx = canvas.getContext("2d");
-
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 const particles = [];
-
 for(let i=0;i<80;i++){
-particles.push({
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-r:Math.random()*2+1,
-dx:(Math.random()-.5)*.5,
-dy:(Math.random()-.5)*.5
-});
+particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2+1,dx:(Math.random()-.5)*.5,dy:(Math.random()-.5)*.5});
 }
 
 function animate(){
 ctx.clearRect(0,0,canvas.width,canvas.height);
-
 particles.forEach(p=>{
 p.x+=p.dx;
 p.y+=p.dy;
-
 if(p.x<0||p.x>canvas.width)p.dx*=-1;
 if(p.y<0||p.y>canvas.height)p.dy*=-1;
-
 ctx.beginPath();
 ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
 ctx.fillStyle="rgba(120,140,255,.7)";
 ctx.fill();
 });
-
 requestAnimationFrame(animate);
 }
-
 animate();
 
+window.onresize=()=>{canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
 </script>
 
 </body>
