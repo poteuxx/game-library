@@ -182,7 +182,6 @@ games
 .filter(g => (filter==="all" || g.tag===filter))
 .filter(g => g.name.toLowerCase().includes(search))
 .forEach(g=>{
-const players = Math.floor(Math.random()*5000)+200;
 const card = document.createElement("div");
 card.className="card";
 card.innerHTML = `
